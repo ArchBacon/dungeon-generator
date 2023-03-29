@@ -13,15 +13,16 @@
 void Game::Init()
 {
     screen->Clear(0);
-    glm::ivec2 screenCenter = {SCRWIDTH / 2, SCRHEIGHT / 2};
+    const glm::ivec2 screenCenter = {SCRWIDTH / 2, SCRHEIGHT / 2};
 
-    const auto generator = Generator();
+    Config config{12, 72, 12, 72};
+    const auto generator = Generator(config);
     Room rooms[100] = {};
 
     for (auto& room : rooms)
     {
         room = generator.Room();
-        auto rpic = RandomPointInCirce(80) + screenCenter;
+        auto rpic = RandomPointInCirce(150) + screenCenter;
         
         screen->Bar(
             rpic.x, rpic.y,

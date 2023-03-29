@@ -157,6 +157,36 @@ void Surface::Line( float x1, float y1, float x2, float y2, uint c )
 	}
 }
 
+void Surface::Circle(int xc, int yc, int radius, uint color)
+{
+	int x = 0;
+	int y = radius;
+	int p = 1 - radius;
+
+	while (x < y)
+	{
+		x++;
+		if (p < 0)
+		{
+			p = p + 2 * x + 1;
+		}
+		else
+		{
+			y--;
+			p = p + 2 * (x - y) + 1;
+		}
+
+		Plot(xc + x, yc + y, color);
+		Plot(xc - x, yc + y, color);
+		Plot(xc + x, yc - y, color);
+		Plot(xc - x, yc - y, color);
+		Plot(xc + y, yc + x, color);
+		Plot(xc - y, yc + x, color);
+		Plot(xc + y, yc - x, color);
+		Plot(xc - y, yc - x, color);
+	}
+}
+
 void Surface::CopyTo( Surface* d, int x, int y )
 {
 	uint* dst = d->pixels;

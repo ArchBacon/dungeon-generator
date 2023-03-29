@@ -18,23 +18,16 @@ void Game::Init()
     Config config{12, 72, 12, 72};
     const auto generator = Generator(config);
     Room rooms[100] = {};
+    const auto color = randomHexColor();
 
     for (auto& room : rooms)
     {
         room = generator.Room();
-        auto rpic = RandomPointInCirce(150) + screenCenter;
-        
-        screen->Bar(
-            rpic.x, rpic.y,
-            rpic.x + room.width, rpic.y + room.height,
-            randomHexColor()
-        );
+        const auto point = RandomPointInCirce(150) + screenCenter;
 
-        screen->Box(
-            rpic.x, rpic.y,
-            rpic.x + room.width, rpic.y + room.height,
-            0xFFFFFF
-        );
+        // Draw room with colored background and white border
+        screen->Bar(point.x, point.y, point.x + room.width, point.y + room.height, color);
+        screen->Box(point.x, point.y, point.x + room.width, point.y + room.height, 0xFFFFFF);
     }
 }
 

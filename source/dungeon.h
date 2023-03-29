@@ -21,15 +21,19 @@ struct Config
     int maxHeight = 50;
 
     Config() = default;
+    Config(const int minWidth, const int maxWidth, const int minHeight, const int maxHeight)
+        : minWidth(minWidth), maxWidth(maxWidth), minHeight(minHeight), maxHeight(maxHeight)
+    {}
 };
 
 class Generator
 {
-    Config config{};
+    Config& config;
 
 public:
-    explicit Generator(const Config config = Config())
-        : config(config) {}
+    explicit Generator(Config& config)
+        : config(config)
+    {}
 
     Room Room() const;
 };

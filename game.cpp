@@ -7,27 +7,32 @@
 
 #include "dungeon.h"
 
+int roomToGenerate = 100;
+int drawnRooms = 0;
+Room rooms[100] = {};
+const glm::ivec2 screenCenter = {SCRWIDTH / 2, SCRHEIGHT / 2};
+Config config{12, 72, 12, 72};
+const auto generator = Generator(config);
+const auto color = randomHexColor();
+Timer drawTimer;
+
+void DrawRoom(Surface* canvas, const Room& room)
+{
+    // Draw room with colored background and white border
+    canvas->Bar(room.position.x, room.position.y, room.position.x + room.width, room.position.y + room.height, color);
+    canvas->Box(room.position.x, room.position.y, room.position.x + room.width, room.position.y + room.height, 0xFFFFFF);
+}
+
 // -----------------------------------------------------------
 // Initialize the application
 // -----------------------------------------------------------
 void Game::Init()
 {
-    screen->Clear(0);
-    const glm::ivec2 screenCenter = {SCRWIDTH / 2, SCRHEIGHT / 2};
-
-    Config config{12, 72, 12, 72};
-    const auto generator = Generator(config);
-    Room rooms[100] = {};
-    const auto color = randomHexColor();
-
     for (auto& room : rooms)
     {
-        room = generator.Room();
         const auto point = RandomPointInCirce(150) + screenCenter;
-
-        // Draw room with colored background and white border
-        screen->Bar(point.x, point.y, point.x + room.width, point.y + room.height, color);
-        screen->Box(point.x, point.y, point.x + room.width, point.y + room.height, 0xFFFFFF);
+        room = generator.Room();
+        room.position = point;
     }
 }
 
@@ -36,4 +41,16 @@ void Game::Init()
 // -----------------------------------------------------------
 void Game::Tick(float deltaTime)
 {
+    screen->Clear(0x000000);
+
+    for (int i = 0; i < drawnRooms; i++)
+    {
+        DrawRoom(screen, rooms[i]);
+    }
+
+    if (drawTimer.elapsed() >= 0.02f && drawnRooms < roomToGenerate)
+    {
+        DrawRoom(screen, rooms[drawnRooms++]);
+        drawTimer.reset();
+    }
 }

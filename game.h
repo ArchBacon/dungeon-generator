@@ -4,6 +4,8 @@
 
 #pragma once
 
+struct Room;
+
 namespace Tmpl8
 {
 	class Game : public TheApp
@@ -22,5 +24,7 @@ namespace Tmpl8
 		void KeyDown(int key) override { /* implement if you want to handle keys */ }
 		// data members
 		int2 mousePos;
+
+		void DrawRoom(Surface* canvas, const Room& room) const;
 	};
 }

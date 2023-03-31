@@ -7,30 +7,25 @@
 
 #include "dungeon.h"
 
-int roomToGenerate = 100;
+constexpr int NUM_ROOMS = 100;
+constexpr glm::ivec2 SCREEN_CENTER = {512, 512};
 int drawnRooms = 0;
-Room rooms[100] = {};
-const glm::ivec2 screenCenter = {SCRWIDTH / 2, SCRHEIGHT / 2};
 Config config{12, 72, 12, 72};
-const auto generator = Generator(config);
-const auto color = randomHexColor();
+Generator generator = Generator(config);
+unsigned int color = randomHexColor();
 Timer drawTimer;
-
-void DrawRoom(Surface* canvas, const Room& room)
-{
-    // Draw room with colored background and white border
-    canvas->Bar(room.position.x, room.position.y, room.position.x + room.width, room.position.y + room.height, color);
-    canvas->Box(room.position.x, room.position.y, room.position.x + room.width, room.position.y + room.height, 0xFFFFFF);
-}
+std::vector<Room> rooms{};
 
 // -----------------------------------------------------------
 // Initialize the application
 // -----------------------------------------------------------
 void Game::Init()
 {
+    rooms.resize(NUM_ROOMS);
+    
     for (auto& room : rooms)
     {
-        const auto point = RandomPointInCirce(150) + screenCenter;
+        const auto point = RandomPointInCirce(150) + SCREEN_CENTER;
         room = generator.Room();
         room.position = point;
     }
@@ -48,9 +43,16 @@ void Game::Tick(float deltaTime)
         DrawRoom(screen, rooms[i]);
     }
 
-    if (drawTimer.elapsed() >= 0.02f && drawnRooms < roomToGenerate)
+    if (drawTimer.elapsed() >= 0.02f && drawnRooms < NUM_ROOMS)
     {
-        DrawRoom(screen, rooms[drawnRooms++]);
+        drawnRooms++;
         drawTimer.reset();
     }
+}
+
+void Game::DrawRoom(Surface* canvas, const Room& room) const
+{
+    // Draw room with colored background and white border
+    canvas->Bar(room.position.x, room.position.y, room.position.x + room.width, room.position.y + room.height, color);
+    canvas->Box(room.position.x, room.position.y, room.position.x + room.width, room.position.y + room.height, 0xFFFFFF);
 }

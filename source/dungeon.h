@@ -7,6 +7,7 @@ struct Room
     int width{};
     int height{};
     glm::ivec2 position{};
+    glm::vec2 velocity{};
 
     Room() = default;
     Room(const int width, const int height)

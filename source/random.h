@@ -12,13 +12,21 @@ int RandomInt(const int min, const int max)
     return dist(gen);
 }
 
+double roundm(double n, double m)
+{
+    return floor(((n + m - 1) / m) * m);
+}
+
 glm::ivec2 RandomPointInCirce(const float radius)
 {
     const auto t = 2 * PI * RandomFloat();
     const auto u = RandomFloat() + RandomFloat();
     const auto r = u > 1 ? 2 - u : u;
 
-    return {radius * r * cos(t), radius * r * sin(t)};
+    return {
+        roundm(radius * r * cos(t), 4),
+        roundm(radius * r * sin(t), 4)
+    };
 }
 
 unsigned int randomHexColor()

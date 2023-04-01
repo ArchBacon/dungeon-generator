@@ -7,7 +7,7 @@ struct Room
     int width{};
     int height{};
     glm::ivec2 position{};
-    glm::vec2 velocity{};
+    b2Fixture* fixture{};
 
     Room() = default;
     Room(const int width, const int height)

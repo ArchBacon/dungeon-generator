@@ -3,6 +3,7 @@
 // IGAD/NHTV/UU - Jacco Bikker - 2006-2023
 
 #pragma once
+#include "physics.h"
 
 struct Room;
 
@@ -10,6 +11,8 @@ namespace Tmpl8
 {
 	class Game : public TheApp
 	{
+		Physics physics{};
+		
 	public:
 		// game flow methods
 		void Init() override;

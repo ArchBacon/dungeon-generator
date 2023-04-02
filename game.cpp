@@ -91,6 +91,7 @@ void Game::Tick(const float deltaTime)
     {
         Room& room = rooms[i];
         DrawRoom(screen, room);
+        screen->Print(to_string(i).c_str(), room.position.x + 10, room.position.y + 10, 0xFFFFFF);
     }
 
     if (drawTimer.elapsed() >= 0.02f && drawnRooms < NUM_ROOMS)
@@ -108,11 +109,25 @@ void Game::Tick(const float deltaTime)
 
     if (physicsTimer.elapsed() >= 1.0f && physicsDone)
     {
+        std::vector<Room> mainRoomsList{};
         
         for (int i = 0; i < drawnMainRooms; i++)
         {
             Room& room = rooms[mainRooms[i]];
+            mainRoomsList.emplace_back(room);
             RedrawMainRooms(screen, room);
+        }
+
+        std::sort(mainRoomsList.begin(), mainRoomsList.end(), [](const Room& a, const Room& b) {
+            float angleA = atan2(a.position.y - 512, a.position.x - 512);
+            float angleB = atan2(b.position.y - 512, b.position.x - 512);
+            return angleA < angleB;
+        });
+
+        for (int i = 0; i < mainRoomsList.size(); i++)
+        {
+            Room& room = mainRoomsList[i];
+            screen->Print(to_string(i).c_str(), room.position.x + 10, room.position.y + 10, 0x000000);
         }
     }
     

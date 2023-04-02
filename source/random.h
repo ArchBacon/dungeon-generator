@@ -29,6 +29,18 @@ glm::ivec2 RandomPointInCirce(const float radius)
     };
 }
 
+glm::ivec2 RandomPointInEllipse(float width, float height)
+{
+    const auto t = 2 * PI * RandomFloat();
+    const auto u = RandomFloat() + RandomFloat();
+    const auto r = u > 1 ? 2 - u : u;
+
+    return {
+        roundm(width * r * cos(t) / 2, 4),
+        roundm(height * r * sin(t) / 2, 4)
+    };
+}
+
 unsigned int randomHexColor()
 {
     srand(time(NULL));

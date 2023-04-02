@@ -9,15 +9,21 @@
 #include "box2d/box2d.h"
 
 constexpr int NUM_ROOMS = 100;
+int NUM_MAIN_ROOMS = 0;
 constexpr glm::ivec2 SCREEN_CENTER = {512, 512};
 int drawnRooms = 0;
-Config config{12, 72, 12, 72};
+int drawnMainRooms = 0;
+Config config{12, 96, 12, 96};
 Generator generator = Generator(config);
 unsigned int color = randomHexColor();
 unsigned int invertedColor = color ^ 0xFFFFFF;
 Timer drawTimer;
+Timer drawTimer2;
 std::vector<Room> rooms{};
+std::vector<int> mainRooms{};
 glm::ivec2 mean{};
+Timer physicsTimer{};
+bool physicsDone = false;
 
 void RedrawMainRooms(Surface* canvas, const Room& room)
 {
@@ -62,6 +68,16 @@ void Game::Init()
     }
 
     mean = {(float)totalWidth / NUM_ROOMS * 1.25f, (float)totalHeight / NUM_ROOMS * 1.25f};
+
+    for (int i = 0; i < rooms.size(); i++)
+    {
+        Room& room = rooms[i];
+        if (room.width >= mean.x && room.height >= mean.y)
+        {
+            NUM_MAIN_ROOMS++;
+            mainRooms.emplace_back(i);
+        }
+    }
 }
 
 // -----------------------------------------------------------
@@ -75,22 +91,35 @@ void Game::Tick(const float deltaTime)
     {
         Room& room = rooms[i];
         DrawRoom(screen, room);
-
-        if (room.width >= mean.x && room.height >= mean.y)
-        {
-            RedrawMainRooms(screen, room);
-        }
     }
 
     if (drawTimer.elapsed() >= 0.02f && drawnRooms < NUM_ROOMS)
     {
         drawnRooms++;
         drawTimer.reset();
+        physicsTimer.reset();
     }
 
     if (drawnRooms >= NUM_ROOMS)
     {
         physics.Update(deltaTime);
+        physicsDone = true;
+    }
+
+    if (physicsTimer.elapsed() >= 1.0f && physicsDone)
+    {
+        
+        for (int i = 0; i < drawnMainRooms; i++)
+        {
+            Room& room = rooms[mainRooms[i]];
+            RedrawMainRooms(screen, room);
+        }
+    }
+    
+    if (drawTimer2.elapsed() >= 0.02f && drawnMainRooms < NUM_MAIN_ROOMS && physicsTimer.elapsed() >= 1.0f && physicsDone)
+    {
+        drawnMainRooms++;
+        drawTimer2.reset();
     }
 
     for (Room& room : rooms)
@@ -99,7 +128,8 @@ void Game::Tick(const float deltaTime)
             room.fixture->GetBody()->GetPosition().x - room.width / 2,
             room.fixture->GetBody()->GetPosition().y - room.height / 2
         };
-        
+
+        /**
         const auto body = room.fixture->GetBody();
         const b2Shape::Type shapeType = room.fixture->GetType();
         
@@ -112,11 +142,12 @@ void Game::Tick(const float deltaTime)
             const b2Vec2 p3 = body->GetWorldPoint(polygonShape->m_vertices[2]);
             const b2Vec2 p4 = body->GetWorldPoint(polygonShape->m_vertices[3]);
 
-            // screen->Line(p1.x, p1.y, p2.x, p2.y, 0x0000FF);
-            // screen->Line(p2.x, p2.y, p3.x, p3.y, 0x0000FF);
-            // screen->Line(p3.x, p3.y, p4.x, p4.y, 0x0000FF);
-            // screen->Line(p4.x, p4.y, p1.x, p1.y, 0x0000FF);
+            screen->Line(p1.x, p1.y, p2.x, p2.y, 0x0000FF);
+            screen->Line(p2.x, p2.y, p3.x, p3.y, 0x0000FF);
+            screen->Line(p3.x, p3.y, p4.x, p4.y, 0x0000FF);
+            screen->Line(p4.x, p4.y, p1.x, p1.y, 0x0000FF);
         }
+        */
     }
 }
 

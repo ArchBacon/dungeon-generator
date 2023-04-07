@@ -3,15 +3,30 @@
 // IGAD/NHTV/UU - Jacco Bikker - 2006-2023
 
 #pragma once
+
+#include "dungeon.h"
 #include "physics.h"
 
-struct Room;
+enum class RenderState : int8_t
+{
+	CREATE_ROOMS,
+	SEPARATE_ROOMS,
+	DECIDING_MAIN_ROOMS,
+	CREATE_CONCAVE_POLYGON,
+	TRIANGULATE,
+	DONE
+};
 
 namespace Tmpl8
 {
 	class Game : public TheApp
 	{
 		Physics physics{};
+		unsigned int color{}, invertedColor{};
+		std::vector<Room> rooms{};
+		std::vector<Room> mainRooms{};
+		std::vector<Room> otherRooms{};
+		RenderState renderState{};
 		
 	public:
 		// game flow methods
@@ -27,7 +42,5 @@ namespace Tmpl8
 		void KeyDown(int key) override { /* implement if you want to handle keys */ }
 		// data members
 		int2 mousePos;
-
-		void DrawRoom(Surface* canvas, const Room& room) const;
 	};
 }

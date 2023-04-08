@@ -51,6 +51,7 @@ public:
 	void Print( const char* t, int x1, int y1, uint c );
 	void Clear( uint c );
 	void Line( float x1, float y1, float x2, float y2, uint c );
+	void Line(int x1, int y1, int x2, int y2, uint c);
 	void Circle(int xc, int yc, int radius, uint color);
 	void Plot( int x, int y, uint c );
 	void LoadFromFile( const char* file );

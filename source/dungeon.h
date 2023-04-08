@@ -10,13 +10,11 @@ struct Room
 {
     glm::ivec2 halfSize{};
     glm::ivec2 position{};
-    b2Fixture* fixture{};
     bool main = false;
 };
 
 Room create_room();
 void create_position_for_room(Room& room, glm::ivec2 position, glm::ivec2 radius);
-void create_fixture_for_room(b2World* world, Room& room);
 void decide_main_rooms(std::vector<Room>& rooms);
 std::vector<Room> create_rooms(int amount, glm::ivec2 minSize, glm::ivec2 maxSize, glm::ivec2 position, glm::ivec2 radius, b2World* world);
 
@@ -25,9 +23,12 @@ glm::ivec2 random_point_in_ellipse(glm::vec2 radius);
 float random_float(float min, float max);
 int random_int(int min, int max);
 
+bool check_overlap(const Room& a, const Room& b);
+void resolve_overlap(Room& a, Room& b);
+
 // -----------------------------------------------------------
 
-Room create_room(const glm::ivec2 minSize, const glm::ivec2 maxSize)
+inline Room create_room(const glm::ivec2 minSize, const glm::ivec2 maxSize)
 {
     Room room{};
     room.halfSize = {
@@ -38,27 +39,9 @@ Room create_room(const glm::ivec2 minSize, const glm::ivec2 maxSize)
     return room;
 }
 
-void create_position_for_room(Room& room, const glm::ivec2 position, const glm::ivec2 radius)
+inline void create_position_for_room(Room& room, const glm::ivec2 position, const glm::ivec2 radius)
 {
     room.position = position + random_point_in_ellipse(radius);
-}
-
-void create_fixture_for_room(b2World* world, Room& room)
-{
-    b2BodyDef bodyDef;
-    bodyDef.type = b2_dynamicBody;
-    bodyDef.position.Set(static_cast<float>(room.position.x), static_cast<float>(room.position.y));
-    b2Body* body = world->CreateBody(&bodyDef);
-
-    b2PolygonShape dynamicBox;
-    dynamicBox.SetAsBox(static_cast<float>(room.halfSize.x), static_cast<float>(room.halfSize.y));
-
-    b2FixtureDef fixtureDef;
-    fixtureDef.shape = &dynamicBox;
-    fixtureDef.density = 1.0f;
-    fixtureDef.friction = 0.3f;
-
-    room.fixture = body->CreateFixture(&fixtureDef);
 }
 
 inline void decide_main_rooms(std::vector<Room>& rooms)
@@ -66,21 +49,20 @@ inline void decide_main_rooms(std::vector<Room>& rooms)
     glm::ivec2 mean{};
     for (const auto& room : rooms)
     {
-        mean += room.position;
+        mean += room.halfSize;
     }
     mean /= static_cast<int>(rooms.size());
-    mean *= 1.25f;
 
-    for (auto& room : rooms)    
+    for (auto& room : rooms)
     {
-        if (room.position.x > mean.x && room.position.y > mean.y)
+        if (room.halfSize.x > mean.x * 1.3 && room.halfSize.y > mean.y * 1.3)
         {
             room.main = true;
         }
     }
 }
 
-std::vector<Room> create_rooms(const int amount, const glm::ivec2 minSize, const glm::ivec2 maxSize, const glm::ivec2 position, const glm::ivec2 radius, b2World* world)
+inline std::vector<Room> create_rooms(const int amount, const glm::ivec2 minSize, const glm::ivec2 maxSize, const glm::ivec2 position, const glm::ivec2 radius, b2World* world)
 {
     std::vector<Room> rooms;
     rooms.reserve(amount);
@@ -89,18 +71,19 @@ std::vector<Room> create_rooms(const int amount, const glm::ivec2 minSize, const
     {
         auto room = create_room(minSize / 2, maxSize / 2);
         create_position_for_room(room, position, radius);
-        create_fixture_for_room(world, room);
-        
+
         rooms.push_back(room);
     }
+
+    return rooms;
 }
 
-glm::ivec2 random_point_in_circle(const float radius)
+inline glm::ivec2 random_point_in_circle(const float radius)
 {
     return random_point_in_ellipse({radius, radius});
 }
 
-glm::ivec2 random_point_in_ellipse(const glm::vec2 radius)
+inline glm::ivec2 random_point_in_ellipse(const glm::vec2 radius)
 {
     const auto t = 2 * PI * random_float(0.0f, 1.0f);
     const auto u = random_float(0.0f, 1.0f) + random_float(0.0f, 1.0f);
@@ -112,16 +95,53 @@ glm::ivec2 random_point_in_ellipse(const glm::vec2 radius)
     };
 }
 
-float random_float(const float min, const float max)
+inline float random_float(const float min, const float max)
 {
     static std::mt19937 generator(std::random_device{}());
     std::uniform_real_distribution distribution(min, max);
     return distribution(generator);
 }
 
-int random_int(const int min, const int max)
+inline int random_int(const int min, const int max)
 {
     static std::mt19937 generator(std::random_device{}());
     std::uniform_int_distribution distribution(min, max);
     return distribution(generator);
+}
+
+// Check if two rooms overlap
+inline bool check_overlap(const Room& a, const Room& b)
+{
+    const glm::ivec2 amin = a.position - a.halfSize;
+    const glm::ivec2 amax = a.position + a.halfSize;
+    const glm::ivec2 bmin = b.position - b.halfSize;
+    const glm::ivec2 bmax = b.position + b.halfSize;
+    return amin.x < bmax.x && amax.x > bmin.x && amin.y < bmax.y && amax.y > bmin.y;
+}
+
+// Resolve overlap between two rooms
+inline void resolve_overlap(Room& a, Room& b)
+{
+    const glm::ivec2 amin = a.position - a.halfSize;
+    const glm::ivec2 amax = a.position + a.halfSize;
+    const glm::ivec2 bmin = b.position - b.halfSize;
+    const glm::ivec2 bmax = b.position + b.halfSize;
+
+    // Calculate overlap amounts in both axes
+    const int xOverlap = std::min(amax.x, bmax.x) - std::max(amin.x, bmin.x);
+    const int yOverlap = std::min(amax.y, bmax.y) - std::max(amin.y, bmin.y);
+
+    // Move the room along its shortest axis
+    if (xOverlap < yOverlap)
+    {
+        const int moveX = (a.position.x < b.position.x ? -1 : 1) * xOverlap / 2;
+        a.position.x += moveX;
+        b.position.x -= moveX;
+    }
+    else
+    {
+        const int moveY = (a.position.y < b.position.y ? -1 : 1) * yOverlap / 2;
+        a.position.y += moveY;
+        b.position.y -= moveY;
+    }
 }

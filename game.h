@@ -17,6 +17,21 @@ enum class RenderState : int8_t
 	DONE
 };
 
+inline const char* to_string(const RenderState e)
+{
+	switch (e)
+	{
+	case RenderState::CREATE_ROOMS: return "Create Rooms";
+	case RenderState::SEPARATE_ROOMS: return "Separate Rooms";
+	case RenderState::DECIDING_MAIN_ROOMS: return "Deciding Main Rooms";
+	case RenderState::CREATE_CONCAVE_POLYGON: return "Create Concave Polygon";
+	case RenderState::TRIANGULATE: return "Triangulate";
+	case RenderState::DONE: return "Done";
+	}
+	
+	return nullptr;
+}
+
 namespace Tmpl8
 {
 	class Game : public TheApp
@@ -26,6 +41,7 @@ namespace Tmpl8
 		std::vector<Room> rooms{};
 		std::vector<Room> mainRooms{};
 		std::vector<Room> otherRooms{};
+		std::vector<Room> triangles{};
 		RenderState renderState{};
 		
 	public:

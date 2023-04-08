@@ -152,7 +152,6 @@
     <ClInclude Include="cl\tools.cl" />
     <ClInclude Include="game.h" />
     <ClInclude Include="source\dungeon.h" />
-    <ClInclude Include="source\physics.h" />
     <ClInclude Include="source\polygon.h" />
     <ClInclude Include="template\common.h" />
     <ClInclude Include="template\opencl.h" />

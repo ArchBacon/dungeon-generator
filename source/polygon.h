@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include <vec2.hpp>
-#include "dungeon.h"
+struct Room;
 
 bool ccw(glm::ivec2 a, glm::ivec2 b, glm::ivec2 c);
 bool cw(glm::ivec2 a, glm::ivec2 b, glm::ivec2 c);
@@ -17,27 +17,27 @@ void create_concave_simple_polygon(std::vector<Room>& rooms, glm::ivec2 center);
 std::vector<Room> triangulate(const std::vector<Room>& rooms);
 // -----------------------------------------------------------
 
-bool ccw(const glm::ivec2 a, const glm::ivec2 b, const glm::ivec2 c)
+inline bool ccw(const glm::ivec2 a, const glm::ivec2 b, const glm::ivec2 c)
 {
     return direction(a, b, c) > 0;
 }
 
-bool cw(const glm::ivec2 a, const glm::ivec2 b, const glm::ivec2 c)
+inline bool cw(const glm::ivec2 a, const glm::ivec2 b, const glm::ivec2 c)
 {
     return direction(a, b, c) < 0;
 }
 
-bool collinear(const glm::ivec2 a, const glm::ivec2 b, const glm::ivec2 c)
+inline bool collinear(const glm::ivec2 a, const glm::ivec2 b, const glm::ivec2 c)
 {
     return direction(a, b, c) == 0;
 }
 
-int direction(const glm::ivec2 a, const glm::ivec2 b, const glm::ivec2 c)
+inline int direction(const glm::ivec2 a, const glm::ivec2 b, const glm::ivec2 c)
 {
     return (c.y - b.y) * (b.x - a.x) - (b.y - a.y) * (c.x - b.x);
 }
 
-bool point_in_triangle(const glm::ivec2 a, const glm::ivec2 b, const glm::ivec2 c, const glm::ivec2 p)
+inline bool point_in_triangle(const glm::ivec2 a, const glm::ivec2 b, const glm::ivec2 c, const glm::ivec2 p)
 {
     int area1 = (p.x - a.x) * (b.y - a.y) - (p.y - a.y) * (b.x - a.x);
     int area2 = (p.x - b.x) * (c.y - b.y) - (p.y - b.y) * (c.x - b.x);
@@ -54,11 +54,11 @@ bool point_in_triangle(const glm::ivec2 a, const glm::ivec2 b, const glm::ivec2 
     return (area1 >= 0 && area2 >= 0 && area3 >= 0) || (area1 <= 0 && area2 <= 0 && area3 <= 0);
 }
 
-void create_concave_simple_polygon(std::vector<glm::ivec2>& vertices, glm::ivec2 center)
+inline void create_concave_simple_polygon(std::vector<glm::ivec2>& vertices, glm::ivec2 center)
 {
     std::sort(vertices.begin(), vertices.end(), [center](const glm::ivec2 a, const glm::ivec2 b) {
-        const float angleA = atan2(a.y - center.y, a.x - center.x);
-        const float angleB = atan2(b.y - center.y, b.x - center.x);
+        const double angleA = atan2(a.y - center.y, a.x - center.x);
+        const double angleB = atan2(b.y - center.y, b.x - center.x);
         return angleA < angleB;
     });
 }
@@ -70,10 +70,10 @@ inline std::vector<glm::ivec2> triangulate(const std::vector<glm::ivec2>& vertic
 
     while (polygon.size() > 3)
     {
-        for (int i = 0; i < polygon.size(); i++)
+        for (int i = 0; i < (int)polygon.size(); i++)
         {
-            int prev = (i == 0) ? polygon.size() - 1 : i - 1;
-            int next = (i == polygon.size() - 1) ? 0 : i + 1;
+            const int prev = (i == 0) ? (int)polygon.size() - 1 : i - 1;
+            const int next = (i == (int)polygon.size() - 1) ? 0 : i + 1;
 
             if (is_ear(polygon[prev], polygon[i], polygon[next], polygon))
             {

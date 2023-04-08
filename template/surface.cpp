@@ -157,6 +157,11 @@ void Surface::Line( float x1, float y1, float x2, float y2, uint c )
 	}
 }
 
+void Surface::Line( int x1, int y1, int x2, int y2, uint c )
+{
+	Line((float)x1, (float)y1, (float)x2, (float)y2, c);
+}
+
 void Surface::Circle(int xc, int yc, int radius, uint color)
 {
 	int x = 0;

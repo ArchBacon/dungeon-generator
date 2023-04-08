@@ -117,20 +117,20 @@
       <PreprocessorDefinitions>WIN64;NDEBUG;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <OpenMPSupport>true</OpenMPSupport>
-      <AdditionalIncludeDirectories>template;.;lib\glad;lib\glfw\include;lib\OpenCL\inc;lib\zlib;source\;lib\glm;lib;lib\box2d\include;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>template;.;lib\glad;lib\glfw\include;lib\OpenCL\inc;lib\zlib;source\;lib\glm;lib;</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>lib/glfw/lib-vc2019;lib/zlib;lib/OpenCL/lib;lib\box2d\lib\rls;</AdditionalLibraryDirectories>
-      <AdditionalDependencies>winmm.lib;advapi32.lib;user32.lib;glfw3.lib;gdi32.lib;shell32.lib;OpenCL.lib;OpenGL32.lib;libz-static.lib;box2d.lib;</AdditionalDependencies>
+      <AdditionalLibraryDirectories>lib/glfw/lib-vc2019;lib/zlib;lib/OpenCL/lib;</AdditionalLibraryDirectories>
+      <AdditionalDependencies>winmm.lib;advapi32.lib;user32.lib;glfw3.lib;gdi32.lib;shell32.lib;OpenCL.lib;OpenGL32.lib;libz-static.lib;</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>template;.;lib\glad;lib\glfw\include;lib\OpenCL\inc;lib\zlib;source\;lib\glm;lib;lib\box2d\include;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>template;.;lib\glad;lib\glfw\include;lib\OpenCL\inc;lib\zlib;source\;lib\glm;lib;</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>lib/glfw/lib-vc2019;lib/zlib;lib/OpenCL/lib;lib\box2d\lib\dbg;</AdditionalLibraryDirectories>
-      <AdditionalDependencies>winmm.lib;advapi32.lib;user32.lib;glfw3.lib;gdi32.lib;shell32.lib;OpenCL.lib;OpenGL32.lib;libz-static.lib;box2d.lib;</AdditionalDependencies>
+      <AdditionalLibraryDirectories>lib/glfw/lib-vc2019;lib/zlib;lib/OpenCL/lib;</AdditionalLibraryDirectories>
+      <AdditionalDependencies>winmm.lib;advapi32.lib;user32.lib;glfw3.lib;gdi32.lib;shell32.lib;OpenCL.lib;OpenGL32.lib;libz-static.lib;</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <!-- END Custom section -->

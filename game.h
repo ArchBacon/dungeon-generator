@@ -5,7 +5,6 @@
 #pragma once
 
 #include "dungeon.h"
-#include "physics.h"
 
 enum class RenderState : int8_t
 {
@@ -36,7 +35,6 @@ namespace Tmpl8
 {
 	class Game : public TheApp
 	{
-		Physics physics{};
 		unsigned int color{}, invertedColor{};
 		std::vector<Room> rooms{};
 		std::vector<Room> mainRooms{};

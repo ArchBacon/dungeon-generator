@@ -65,8 +65,7 @@ void Game::Tick(const float deltaTime)
             {12, 12},
             {72, 72},
             circleCenter,
-            {150, 150},
-            physics.GetWorld()
+            {150, 150}
         );
         roomsCreated = true;
 
@@ -134,7 +133,7 @@ void Game::Tick(const float deltaTime)
             const auto next = mainRooms[(i + 1) % mainRooms.size()];
             screen->Line(current.position.x, current.position.y, next.position.x, next.position.y, 0xFF0000);
 
-            screen->Print(to_string(i).c_str(), current.position.x, current.position.y, 0x000000);
+            screen->Print((to_string(i) + " (" + to_string(current.id) + ")").c_str(), current.position.x - 15, current.position.y, 0x000000);
         }
     }
     
@@ -142,25 +141,71 @@ void Game::Tick(const float deltaTime)
     if (renderState == RenderState::TRIANGULATE && !triangulatedPolygon)
     {
         std::vector<Room> polygon = mainRooms;
+
+        auto ear = [](const Room& prev, const Room& curr, const Room& next, const std::vector<Room>& polygon)
+        {
+            if (!ccw(prev.position, curr.position, next.position))
+            {
+                // printf("Not clockwise ");
+                return false;
+            }
+            
+            for (const auto& room : polygon)
+            {
+                if (room.id == prev.id || room.id == curr.id || room.id == next.id)
+                    continue;
+                
+                if (point_in_triangle(prev.position, curr.position, next.position, room.position))
+                    // printf("Point in triangle ");
+                    return false;
+            }
+            return true;
+        };
+
         while (polygon.size() > 3)
         {
-            
+            printf("+----------------------------------------------------\n");
+            const int n = (int)polygon.size();
+            printf("Poly size: %i\n", n);
+            for (int i = 0; i < n; i++)
+            {
+                auto prev = mainRooms[(i - 1 + n) % n];
+                auto curr = mainRooms[i];
+                auto next = mainRooms[(i + 1) % n];
+
+                printf("Is ear: (%d, %d, %d): %s\n", prev.id, curr.id, next.id, ear(prev, curr, next, polygon) ? "true" : "false");
+                if (ear(prev, curr, next, polygon))
+                {
+                    triangles.emplace_back(prev);
+                    triangles.emplace_back(curr);
+                    triangles.emplace_back(next);
+
+                    polygon.erase(polygon.begin() + i);
+                    break;
+                }
+            }
         }
+
+        triangles.push_back(polygon[0]);
+        triangles.push_back(polygon[1]);
+        triangles.push_back(polygon[2]);
+
+        printf("triangles: %llu", triangles.size());
         
         triangulatedPolygon = true;
         renderState = RenderState::DONE;
     }
-    // else if (triangulatedPolygon)
-    // {
-    //     for (unsigned int i = 0; i < triangles.size(); i += 3)
-    //     {
-    //         const auto p1 = triangles[i + 0];
-    //         const auto p2 = triangles[i + 1];
-    //         const auto p3 = triangles[i + 2];
-    //
-    //         screen->Line(p1.position.x, p1.position.y, p2.position.x, p2.position.y, 0x00FF00);
-    //         screen->Line(p2.position.x, p2.position.y, p3.position.x, p3.position.y, 0x00FF00);
-    //         screen->Line(p3.position.x, p3.position.y, p1.position.x, p1.position.y, 0x00FF00);
-    //     }
-    // }
+    else if (triangulatedPolygon)
+    {
+        for (unsigned int i = 0; i < triangles.size(); i += 3)
+        {
+            const auto p1 = triangles[i + 0];
+            const auto p2 = triangles[i + 1];
+            const auto p3 = triangles[i + 2];
+    
+            screen->Line(p1.position.x, p1.position.y, p2.position.x, p2.position.y, 0x00FF00);
+            screen->Line(p2.position.x, p2.position.y, p3.position.x, p3.position.y, 0x00FF00);
+            screen->Line(p3.position.x, p3.position.y, p1.position.x, p1.position.y, 0x00FF00);
+        }
+    }
 }

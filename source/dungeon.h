@@ -2,12 +2,10 @@
 
 #include <random>
 #include <vec2.hpp>
-#include <box2d/b2_fixture.h>
-#include <box2d/b2_polygon_shape.h>
-#include <box2d/b2_world.h>
 
 struct Room
 {
+    int id = -1;
     glm::ivec2 halfSize{};
     glm::ivec2 position{};
     bool main = false;
@@ -16,7 +14,7 @@ struct Room
 Room create_room();
 void create_position_for_room(Room& room, glm::ivec2 position, glm::ivec2 radius);
 void decide_main_rooms(std::vector<Room>& rooms);
-std::vector<Room> create_rooms(int amount, glm::ivec2 minSize, glm::ivec2 maxSize, glm::ivec2 position, glm::ivec2 radius, b2World* world);
+std::vector<Room> create_rooms(int amount, glm::ivec2 minSize, glm::ivec2 maxSize, glm::ivec2 position, glm::ivec2 radius);
 
 glm::ivec2 random_point_in_circle(float radius);
 glm::ivec2 random_point_in_ellipse(glm::vec2 radius);
@@ -62,7 +60,7 @@ inline void decide_main_rooms(std::vector<Room>& rooms)
     }
 }
 
-inline std::vector<Room> create_rooms(const int amount, const glm::ivec2 minSize, const glm::ivec2 maxSize, const glm::ivec2 position, const glm::ivec2 radius, b2World* world)
+inline std::vector<Room> create_rooms(const int amount, const glm::ivec2 minSize, const glm::ivec2 maxSize, const glm::ivec2 position, const glm::ivec2 radius)
 {
     std::vector<Room> rooms;
     rooms.reserve(amount);
@@ -70,6 +68,7 @@ inline std::vector<Room> create_rooms(const int amount, const glm::ivec2 minSize
     for (int i = 0; i < amount; i++)
     {
         auto room = create_room(minSize / 2, maxSize / 2);
+        room.id = i;
         create_position_for_room(room, position, radius);
 
         rooms.push_back(room);
